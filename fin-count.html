@@ -39,7 +39,7 @@
       for (var k in wd_count) {
           order.push(k);
       }
-      order.sort(function(x,y){ return wd_count[x] < wd_count[y]; });
+      order.sort(function(x,y){ return wd_count[y] - wd_count[x]; });
       let s = "";
       for (let i = 0; i < order.length; i++) {
           let wd = order[i];

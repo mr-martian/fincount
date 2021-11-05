@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <title>Finnish Counter</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <meta charset="UTF-8"/>
+  </head>
+  <body>
+    <input type="text" id="input"></input>
+    <button onclick="run();">Count</button>
+    <ol id="output"></ol>
+<script>
+  var getlemma = function(lst) {
+      let s = lst[0].split('/')[1];
+      if (s.includes('><')) {
+          return s.split('><')[0] + '>';
+      } else if (s.includes('>')) {
+          return s;
+      } else {
+          return '*';
+      }
+  };
+  var count = function(lst) {
+      let counts = {};
+      for (let i = 0; i < lst.length; i++) {
+          let k = getlemma(lst[i]);
+          if (!counts.hasOwnProperty(k)) {
+              counts[k] = 0;
+          }
+          counts[k]++;
+          console.log(['getlemma', lst[i][0], k]);
+      }
+      return counts;
+  };
+  var display = function(lst) {
+      console.log(['display', lst]);
+      let wd_count = count(lst);
+      console.log(wd_count);
+      let order = [];
+      for (var k in wd_count) {
+          order.push(k);
+      }
+      order.sort(function(x,y){ return wd_count[x] < wd_count[y]; });
+      let s = "";
+      for (let i = 0; i < order.length; i++) {
+          let wd = order[i];
+          if (wd.includes('<sent>') || wd.includes('<sym>') || wd == '*') {
+              continue;
+          }
+          s += '<li>' + wd.replace('<', '&lt;').replace('>', '&gt;') + ' (' + wd_count[wd] + ')</li>';
+      }
+      console.log(s);
+      document.getElementById('output').innerHTML = s;
+  };
+
+  var run = function() {
+      $.ajax({
+          url: "https://beta.apertium.org/apy/analyse",
+          jsonp: "callback",
+          dataType: "jsonp",
+          data: {
+              lang: "fin",
+              modes: "disam",
+              q: document.getElementById("input").value
+          },
+          contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+          success: function(response) {
+              console.log(response);
+              display(response);
+          }
+      });
+  };
+</script>
+  </body>
+</html>
